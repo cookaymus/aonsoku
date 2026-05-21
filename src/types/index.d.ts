@@ -21,5 +21,6 @@ declare global {
     DISABLE_IMAGE_CACHE_TOGGLE: boolean | undefined
     DISABLE_DOWNLOADS: boolean | undefined
     DISABLE_LRCLIB: boolean | undefined
+    PREFETCH_NEXT_TRACK: boolean | undefined
   }
 }

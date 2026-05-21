@@ -6,6 +6,7 @@ import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { shallow } from 'zustand/shallow'
 import { createWithEqualityFn } from 'zustand/traditional'
+import { getSongStreamUrl } from '@/api/httpClient'
 import { scrobble } from '@/service/scrobble'
 import { subsonic } from '@/service/subsonic'
 import {
@@ -18,7 +19,9 @@ import { ISong } from '@/types/responses/song'
 import { areSongListsEqual } from '@/utils/compareSongLists'
 import { isDesktop } from '@/utils/desktop'
 import { discordRpc } from '@/utils/discordRpc'
+import { PREFETCH_LEAD_SECONDS, prefetch } from '@/utils/prefetch'
 import { addNextSongList, shuffleSongList } from '@/utils/songListFunctions'
+import { useAppStore } from './app.store'
 import { idbStorage } from './idb'
 
 const miniStores = {
@@ -564,6 +567,7 @@ export const usePlayerStore = createWithEqualityFn<IPlayerContext>()(
               }
             },
             clearPlayerState: () => {
+              prefetch.reset()
               set((state) => {
                 state.songlist.originalList = []
                 state.songlist.shuffledList = []
@@ -1100,6 +1104,33 @@ usePlayerStore.subscribe((state, prevState) => {
     scrobble.send(currentSong.id, true)
   }
 })
+
+usePlayerStore.subscribe((state) => {
+  const { mediaType, isPlaying, currentDuration } = state.playerState
+  if (mediaType !== 'song' || !isPlaying || currentDuration <= 0) return
+
+  const { prefetchNextTrackEnabled } = useAppStore.getState().pages
+  if (!prefetchNextTrackEnabled) return
+
+  const remaining = currentDuration - state.playerProgress.progress
+  if (remaining > PREFETCH_LEAD_SECONDS) return
+
+  const { currentList, currentSongIndex } = state.songlist
+  const nextSong = currentList[currentSongIndex + 1]
+  if (!nextSong) return
+
+  prefetch.prefetchNext(nextSong.id, getSongStreamUrl(nextSong.id))
+})
+
+usePlayerStore.subscribe(
+  (state) => [state.songlist.currentSongIndex, state.songlist.currentList],
+  () => {
+    prefetch.cancel()
+  },
+  {
+    equalityFn: shallow,
+  },
+)
 
 function desktopStateListener() {
   if (!isDesktop()) return

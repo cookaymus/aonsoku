@@ -37,6 +37,8 @@ interface IAppPages {
   setArtistsPageViewType: (type: PageViewType) => void
   imagesCacheLayerEnabled: boolean
   setImagesCacheLayerEnabled: (value: boolean) => void
+  prefetchNextTrackEnabled: boolean
+  setPrefetchNextTrackEnabled: (value: boolean) => void
   isAllSectionsHidden: () => boolean
 }
 

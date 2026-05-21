@@ -675,6 +675,14 @@
           "label": "Prefer synced lyrics",
           "info": "When enabled, synced lyrics will be prioritized over unsynced lyrics."
         }
+      },
+      "prefetch": {
+        "group": "Next-Track Prefetch",
+        "description": "Warm the next track in the background to reduce gaps between songs.",
+        "enabled": {
+          "label": "Enable Next-Track Prefetch",
+          "info": "When enabled, the next track in the queue is fetched in the background near the end of the current track, so playback can switch instantly."
+        }
       }
     },
     "privacy": {

@@ -18,3 +18,4 @@ window.IMAGE_CACHE_ENABLED="${IMAGE_CACHE_ENABLED}" === "true";
 window.DISABLE_IMAGE_CACHE_TOGGLE="${DISABLE_IMAGE_CACHE_TOGGLE}" === "true";
 window.DISABLE_DOWNLOADS="${DISABLE_DOWNLOADS}" === "true";
 window.DISABLE_LRCLIB="${DISABLE_LRCLIB}" === "true";
+window.PREFETCH_NEXT_TRACK="${PREFETCH_NEXT_TRACK}" === "true" ? true : "${PREFETCH_NEXT_TRACK}" === "false" ? false : undefined;

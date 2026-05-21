@@ -10,6 +10,7 @@ import { AuthType, IAppContext, IServerConfig } from '@/types/serverConfig'
 import { isDesktop } from '@/utils/desktop'
 import { discordRpc } from '@/utils/discordRpc'
 import { logger } from '@/utils/logger'
+import { prefetch } from '@/utils/prefetch'
 import {
   genEncodedPassword,
   genPassword,
@@ -31,6 +32,7 @@ const {
   HIDE_RADIOS_SECTION,
   SERVER_TYPE,
   IMAGE_CACHE_ENABLED,
+  PREFETCH_NEXT_TRACK,
 } = window
 
 const defaultArtworkServiceUrl = 'https://artwork.m8tec.top'
@@ -211,6 +213,12 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.pages.imagesCacheLayerEnabled = value
               })
             },
+            prefetchNextTrackEnabled: PREFETCH_NEXT_TRACK ?? true,
+            setPrefetchNextTrackEnabled: (value) => {
+              set((state) => {
+                state.pages.prefetchNextTrackEnabled = value
+              })
+            },
             isAllSectionsHidden: () => {
               const {
                 hideArtistsSection,
@@ -342,6 +350,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
               return false
             },
             removeConfig: () => {
+              prefetch.reset()
               set((state) => {
                 state.data.isServerConfigured = false
                 state.data.osType = ''
@@ -395,6 +404,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
             let hidePlaylistsSection = false
             let hideRadiosSection = false
             let enableImageCache = false
+            let enablePrefetchNextTrack = true
 
             if (persisted && persisted.pages) {
               hideArtistsSection = persisted.pages.hideArtistsSection ?? false
@@ -407,6 +417,8 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
               hideRadiosSection = persisted.pages.hideRadiosSection ?? false
               enableImageCache =
                 persisted.pages.imagesCacheLayerEnabled ?? false
+              enablePrefetchNextTrack =
+                persisted.pages.prefetchNextTrackEnabled ?? true
             }
             if (HIDE_ARTISTS_SECTION !== undefined) {
               hideArtistsSection = HIDE_ARTISTS_SECTION
@@ -429,6 +441,9 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
             if (IMAGE_CACHE_ENABLED !== undefined) {
               enableImageCache = IMAGE_CACHE_ENABLED
             }
+            if (PREFETCH_NEXT_TRACK !== undefined) {
+              enablePrefetchNextTrack = PREFETCH_NEXT_TRACK
+            }
 
             if (hasValidConfig) {
               const newState = {
@@ -446,6 +461,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                   hidePlaylistsSection,
                   hideRadiosSection,
                   imagesCacheLayerEnabled: enableImageCache,
+                  prefetchNextTrackEnabled: enablePrefetchNextTrack,
                 },
               }
 
@@ -468,6 +484,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 hidePlaylistsSection,
                 hideRadiosSection,
                 imagesCacheLayerEnabled: enableImageCache,
+                prefetchNextTrackEnabled: enablePrefetchNextTrack,
               },
             }
 
@@ -558,4 +575,9 @@ export const useAppImagesCacheLayer = () =>
   useAppStore((state) => ({
     imagesCacheLayerEnabled: state.pages.imagesCacheLayerEnabled,
     setImagesCacheLayerEnabled: state.pages.setImagesCacheLayerEnabled,
+  }))
+export const useAppPrefetchNextTrack = () =>
+  useAppStore((state) => ({
+    prefetchNextTrackEnabled: state.pages.prefetchNextTrackEnabled,
+    setPrefetchNextTrackEnabled: state.pages.setPrefetchNextTrackEnabled,
   }))
