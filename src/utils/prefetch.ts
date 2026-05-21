@@ -6,6 +6,11 @@ import { logger } from './logger'
 // fetch worst case while keeping the prefetched URL from sitting idle.
 export const PREFETCH_LEAD_SECONDS = 30
 
+// Bounded concurrency for the "Prefetch all" album action. Two keeps Octo-
+// Fiesta's upstream load manageable (Qobuz/SquidWTF rate-limit risk) while
+// roughly halving wall-clock time vs. strict serial fetching.
+export const PREFETCH_ALBUM_CONCURRENCY = 2
+
 const prefetched = new Set<string>()
 let activeController: AbortController | null = null
 
@@ -47,8 +52,64 @@ function reset() {
   prefetched.clear()
 }
 
+interface PrefetchItem {
+  id: string
+  streamUrl: string
+}
+
+interface PrefetchAllOptions {
+  signal: AbortSignal
+  onProgress: (completed: number, total: number) => void
+}
+
+async function prefetchAll(
+  items: PrefetchItem[],
+  { signal, onProgress }: PrefetchAllOptions,
+): Promise<void> {
+  const todo = items.filter((item) => !prefetched.has(item.id))
+  const total = items.length
+  let completed = total - todo.length
+  onProgress(completed, total)
+
+  if (todo.length === 0) return
+
+  let index = 0
+
+  async function worker() {
+    while (true) {
+      if (signal.aborted) return
+      const i = index++
+      if (i >= todo.length) return
+      const item = todo[i]
+      prefetched.add(item.id)
+      try {
+        await fetch(item.streamUrl, {
+          method: 'GET',
+          headers: { Range: 'bytes=0-0' },
+          signal,
+        })
+      } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+          // Un-claim the slot so a future bulk run can retry it.
+          prefetched.delete(item.id)
+          return
+        }
+        logger.error('[prefetch] Failed to bulk-prefetch track', error)
+      }
+      completed += 1
+      onProgress(completed, total)
+    }
+  }
+
+  const workerCount = Math.min(PREFETCH_ALBUM_CONCURRENCY, todo.length)
+  await Promise.all(
+    Array.from({ length: workerCount }, () => worker()),
+  )
+}
+
 export const prefetch = {
   prefetchNext,
+  prefetchAll,
   cancel,
   reset,
 }

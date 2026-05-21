@@ -144,7 +144,13 @@
       "pause": "Pause {{name}}",
       "shuffle": "Play {{name}} in shuffle mode",
       "like": "Like {{name}}",
-      "dislike": "Remove like from {{name}}"
+      "dislike": "Remove like from {{name}}",
+      "prefetchAll": "Prefetch all",
+      "prefetchingAll": "Prefetching… {{completed}} / {{total}} — click to cancel"
+    },
+    "toasts": {
+      "prefetchComplete": "Album prefetched",
+      "prefetchCancelled": "Prefetch cancelled"
     },
     "info": {
       "about": "About {{name}}",

@@ -12,6 +12,7 @@ import { PlaybackSource } from '@/types/playerContext'
 import { SingleAlbum } from '@/types/responses/album'
 import { queryKeys } from '@/utils/queryKeys'
 import { AlbumOptions } from './options'
+import { PrefetchAllButton } from './prefetch-all-button'
 
 interface AlbumButtonsProps {
   album: SingleAlbum
@@ -114,6 +115,8 @@ export function AlbumButtons({ album, showInfoButton }: AlbumButtonsProps) {
           <Actions.InfoIcon />
         </Actions.Button>
       )}
+
+      <PrefetchAllButton songs={album.song} />
 
       <Actions.Dropdown
         tooltip={buttonsTooltips.options}
