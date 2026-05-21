@@ -113,7 +113,7 @@ version: '3.8'
 services:
   aonsoku:
     container_name: aonsoku
-    image: ghcr.io/victoralvesf/aonsoku:latest
+    image: ghcr.io/cookaymus/aonsoku:latest
     restart: unless-stopped
     ports:
       - 8080:8080
@@ -126,7 +126,7 @@ Description=Aonsoku Container
 
 [Container]
 ContainerName=aonsoku
-Image=ghcr.io/victoralvesf/aonsoku:latest
+Image=ghcr.io/cookaymus/aonsoku:latest
 PublishPort=8080:8080
 AutoUpdate=registry
 
