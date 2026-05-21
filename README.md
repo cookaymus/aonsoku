@@ -159,6 +159,7 @@ Below is a table describing the environment variables that can be used in this p
 | `DISABLE_IMAGE_CACHE_TOGGLE` | `false` | Set to `true` to prevent the user from changing the image cache setting.                                  |                              |
 | `DISABLE_DOWNLOADS`   | `false`    | Set to `true` to disable song downloads.                                                                          |                              |
 | `DISABLE_LRCLIB`      | `false`    | Set to `true` to disable downloading lyrics from LRCLIB.                                                          |                              |
+| `PREFETCH_NEXT_TRACK` | `true`     | Set to `false` to disable next-track prefetching. When enabled, the upcoming track in the queue is requested 30 s before the current track ends so on-demand upstream proxies (e.g. Octo-Fiesta) can warm their cache and tracks play gaplessly. |                              |
 
 **Notes:**
 - **Automatic Login:** To enable automatic login across devices. This should only be used in secure local environments to avoid password compromise.
